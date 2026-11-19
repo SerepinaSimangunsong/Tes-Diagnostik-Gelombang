@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Diagnostik Fisika: Gelombang (Three-Tier Test)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- ==================== VIEW 1: SETUP & PILIH LEVEL ==================== -->
+    <main id="view-setup" class="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div class="max-w-3xl w-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 md:p-8 text-white flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold tracking-wide mb-3">
+                        <i class="fa-solid fa-wave-square"></i> COMPUTER BASED TEST (CBT) • THREE-TIER DIAGNOSTIC
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Ujian Diagnostik Fisika: Materi Gelombang</h1>
+                    <p class="text-blue-100 text-sm md:text-base mt-2 max-w-xl">
+                        Mengukur pemahaman konsep peserta didik ke dalam 3 kategori: <strong>Paham Ilmiah</strong>, <strong>Miskonsepsi</strong>, dan <strong>Tidak Paham Konsep</strong>.
+                    </p>
+                </div>
+                <button id="btn-open-teacher" type="button" class="px-4 py-2.5 rounded-xl bg-white text-indigo-900 hover:bg-indigo-50 text-xs font-extrabold shadow transition flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-chalkboard-user"></i> Masuk Sebagai Guru
+                </button>
+            </div>
+
+            <div class="p-6 md:p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="input-name" class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Lengkap Peserta <span class="text-red-500">*</span></label>
+                        <input type="text" id="input-name" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                    </div>
+                    <div>
+                        <label for="input-class" class="block text-sm font-semibold text-slate-700 mb-1.5">Kelas / Kelompok</label>
+                        <input type="text" id="input-class" placeholder="Contoh: XI IPA 1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Subbab Level Kesulitan (Masing-masing 10 Soal):</label>
+                    <div id="level-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 space-y-1.5">
+                    <div class="font-bold text-slate-800 text-sm mb-1"><i class="fa-solid fa-circle-info text-blue-600 mr-1.5"></i>Format Soal Diagnostik 3 Tingkat:</div>
+                    <p><strong>Tier 1 (Jawaban Utama):</strong> Pilih jawaban yang paling tepat atas pernyataan/pertanyaan yang diberikan.</p>
+                    <p><strong>Tier 2 (Alasan Ilmiah):</strong> Pilih alasan konseptual yang mendasari pilihan jawaban Anda pada Tier 1.</p>
+                    <p><strong>Tier 3 (Tingkat Keyakinan):</strong> Tentukan apakah Anda <em>Yakin</em> atau <em>Tidak Yakin</em> terhadap jawaban dan alasan Anda.</p>
+                </div>
+
+                <button id="btn-start-exam" type="button" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-play"></i> Mulai Ujian CBT Sekarang
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== VIEW 2: ANTARMUKA UJIAN CBT ==================== -->
+    <div id="view-exam" class="hidden flex-1 flex flex-col">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-atom"></i>
+                    </div>
+                    <div>
+                        <div id="header-level-badge" class="text-xs font-bold text-blue-600 uppercase tracking-wide">Level</div>
+                        <div id="header-student-info" class="text-sm font-bold text-slate-800">Peserta</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200">
+                        <i class="fa-regular fa-clock text-slate-500"></i>
+                        <span class="text-xs text-slate-500 hidden sm:inline">Sisa Waktu:</span>
+                        <span id="exam-timer" class="font-mono font-extrabold text-base text-slate-800">15:00</span>
+                    </div>
+                    <button id="btn-finish-top" type="button" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs md:text-sm font-bold rounded-xl transition">
+                        Selesai Ujian
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl w-full mx-auto px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <section class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-7 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <span id="q-number-badge" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-sm">SOAL NO. 1</span>
+                    <label class="inline-flex items-center gap-2 cursor-pointer bg-amber-50 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-900">
+                        <input type="checkbox" id="check-ragu" class="accent-amber-500 w-4 h-4">
+                        Tandai Ragu-ragu
+                    </label>
+                </div>
+
+                <div id="q-text" class="text-base md:text-lg font-semibold text-slate-800 leading-relaxed">
+                    Memuat soal...
+                </div>
+
+                <div class="space-y-2.5">
+                    <div class="text-xs font-extrabold uppercase tracking-wider text-blue-700 flex items-center gap-1.5">
+                        <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 inline-flex items-center justify-center">1</span>
+                        Tingkat 1: Pilih Jawaban Utama
+                    </div>
+                    <div id="tier1-options" class="space-y-2"></div>
+                </div>
+
+                <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">
+                        <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center justify-center">2</span>
+                        Tingkat 2: Pilih Alasan Ilmiah
+                    </div>
+                    <div id="tier2-options" class="space-y-2"></div>
+                </div>
+
+                <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 inline-flex items-center justify-center">3</span>
+                        Tingkat 3: Seberapa Yakin Anda dengan Jawaban & Alasan di Atas?
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" id="btn-tier3-yakin">
+                            <i class="fa-solid fa-circle-check"></i> Yakin
+                        </button>
+                        <button type="button" id="btn-tier3-tidak">
+                            <i class="fa-solid fa-circle-question"></i> Tidak Yakin
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+                    <button type="button" id="btn-prev" class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 text-sm font-semibold text-slate-700 transition">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+                    </button>
+                    <button type="button" id="btn-next" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition">
+                        Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </section>
+
+            <aside class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4 sticky top-20">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Navigasi Nomor Soal</h2>
+                    <span id="progress-summary" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">0 / 10 Lengkap</span>
+                </div>
+
+                <div id="nav-grid" class="grid grid-cols-5 gap-2.5"></div>
+
+                <div class="pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
+                    <div class="font-semibold text-slate-700">Keterangan Status:</div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-emerald-600 inline-block"></span> Terjawab Lengkap (Tier 1, 2, 3)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-amber-400 inline-block"></span> Ditandai Ragu-ragu
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-sky-100 border border-sky-400 inline-block"></span> Terisi Sebagian
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-white border border-slate-300 inline-block"></span> Belum Dijawab
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: HASIL DIAGNOSTIK SISWA ==================== -->
+    <div id="view-result" class="hidden flex-1 py-8 px-4">
+        <div class="max-w-5xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Laporan Profil Pemahaman Konsep</span>
+                        <h1 class="text-2xl font-extrabold text-slate-800 mt-1">Hasil Analisis Diagnostik Gelombang</h1>
+                        <p class="text-sm text-slate-500 mt-1">
+                            Peserta: <strong id="res-student-name" class="text-slate-700">-</strong> • Kelas: <strong id="res-student-class" class="text-slate-700">-</strong> • <span id="res-level-title" class="text-blue-600 font-semibold">-</span>
+                        </p>
+                    </div>
+                    <button id="btn-restart" type="button" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition no-print">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Pilih Level Lain / Beranda
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="p-5 rounded-xl bg-emerald-50 border border-emerald-200">
+                        <div class="text-xs font-bold text-emerald-700 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Paham Ilmiah
+                        </div>
+                        <div id="count-paham-ilmiah" class="text-2xl font-extrabold text-emerald-900 mt-1.5">0 (0%)</div>
+                        <p class="text-xs text-emerald-700 mt-1">Jawaban benar, alasan ilmiah tepat, dan yakin.</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-rose-50 border border-rose-200">
+                        <div class="text-xs font-bold text-rose-700 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Miskonsepsi
+                        </div>
+                        <div id="count-miskonsepsi" class="text-2xl font-extrabold text-rose-900 mt-1.5">0 (0%)</div>
+                        <p class="text-xs text-rose-700 mt-1">Alasan keliru, jawaban-alasan bertentangan, atau yakin pada konsep salah.</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-slate-100 border border-slate-300">
+                        <div class="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-question"></i> Tidak Paham Konsep
+                        </div>
+                        <div id="count-tidak-paham" class="text-2xl font-extrabold text-slate-900 mt-1.5">0 (0%)</div>
+                        <p class="text-xs text-slate-600 mt-1">Jawaban dan alasan salah disertai rasa tidak yakin.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-slate-500 mb-2">Proporsi Profil Pemahaman (10 Soal):</div>
+                    <div class="w-full h-4 bg-slate-200 rounded-full overflow-hidden flex">
+                        <div id="bar-paham-ilmiah" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="bar-miskonsepsi" class="bg-rose-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="bar-tidak-paham" class="bg-slate-400 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 no-print">
+                    <h2 class="text-lg font-bold text-slate-800">Rincian Diagnostik & Pembahasan Per Soal</h2>
+                    <div class="flex flex-wrap gap-1.5 text-xs font-semibold">
+                        <button type="button" data-filter="all" class="filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-white">Semua (10)</button>
+                        <button type="button" data-filter="paham_ilmiah" class="filter-btn px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">Paham Ilmiah</button>
+                        <button type="button" data-filter="miskonsepsi" class="filter-btn px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">Miskonsepsi</button>
+                        <button type="button" data-filter="tidak_paham" class="filter-btn px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50">Tidak Paham Konsep</button>
+                    </div>
+                </div>
+
+                <div id="diagnostic-list" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 4: DASHBOARD GURU ==================== -->
+    <div id="view-teacher" class="hidden flex-1 flex flex-col">
+        <header class="bg-indigo-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-indigo-200 font-bold">Panel Administrator Guru</span>
+                        <h1 class="text-lg font-extrabold">Transkrip Nilai & Rekap Diagnostik Siswa</h1>
+                    </div>
+                </div>
+                <button id="btn-exit-teacher" type="button" class="px-4 py-2 rounded-xl bg-white text-indigo-900 hover:bg-indigo-50 text-xs font-bold transition">
+                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali ke Halaman Ujian
+                </button>
+            </div>
+        </header>
+
+        <div class="max-w-7xl w-full mx-auto px-4 py-6 flex-1 space-y-6">
+            <div class="flex flex-wrap gap-2">
+                <button id="tab-btn-rekap" type="button" class="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold transition">
+                    <i class="fa-solid fa-table-list mr-1.5"></i> Transkrip Nilai Siswa
+                </button>
+                <button id="tab-btn-bank" type="button" class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 text-sm font-bold transition">
+                    <i class="fa-solid fa-pen-to-square mr-1.5"></i> Kelola Bank Soal & Kunci
+                </button>
+                <button id="tab-btn-setting" type="button" class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 text-sm font-bold transition">
+                    <i class="fa-solid fa-key mr-1.5"></i> Pengaturan PIN Guru
+                </button>
+            </div>
+
+            <div id="teacher-panel-rekap" class="space-y-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-500 uppercase">Jumlah Siswa Menjawab</div>
+                        <div id="teacher-stat-total" class="text-2xl font-extrabold text-indigo-700 mt-1">0 Siswa</div>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                        <div class="text-xs font-bold text-emerald-700 uppercase">Rata-rata Paham Ilmiah</div>
+                        <div id="teacher-stat-ilmiah" class="text-2xl font-extrabold text-emerald-900 mt-1">0%</div>
+                    </div>
+                    <div class="bg-rose-50 p-4 rounded-xl border border-rose-200">
+                        <div class="text-xs font-bold text-rose-700 uppercase">Rata-rata Miskonsepsi</div>
+                        <div id="teacher-stat-miskonsepsi" class="text-2xl font-extrabold text-rose-900 mt-1">0%</div>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-300">
+                        <div class="text-xs font-bold text-slate-700 uppercase">Rata-rata Tidak Paham</div>
+                        <div id="teacher-stat-tidak-paham" class="text-2xl font-extrabold text-slate-900 mt-1">0%</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <input type="text" id="teacher-search-student" placeholder="Cari nama atau kelas siswa..." class="px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                        <select id="teacher-filter-level" class="px-3.5 py-2 rounded-lg border border-slate-300 text-sm bg-white">
+                            <option value="all">Semua Level</option>
+                            <option value="1">Level 1: Wave Check</option>
+                            <option value="2">Level 2: Mudah</option>
+                            <option value="3">Level 3: Sedang</option>
+                            <option value="4">Level 4: Susah</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-export-csv" type="button" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+                            <i class="fa-solid fa-file-csv mr-1.5"></i> Download Transkrip (CSV/Excel)
+                        </button>
+                        <button id="btn-clear-all-results" type="button" class="px-3.5 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Hapus Semua
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-600">
+                                <th class="p-3.5">No</th>
+                                <th class="p-3.5">Waktu Selesai</th>
+                                <th class="p-3.5">Nama Siswa</th>
+                                <th class="p-3.5">Kelas</th>
+                                <th class="p-3.5">Subbab Level</th>
+                                <th class="p-3.5 text-center">Skor Pemahaman</th>
+                                <th class="p-3.5 text-center">Paham Ilmiah</th>
+                                <th class="p-3.5 text-center">Miskonsepsi</th>
+                                <th class="p-3.5 text-center">Tidak Paham</th>
+                                <th class="p-3.5 text-right">Transkrip</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-results-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="teacher-panel-bank" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Editor Bank Soal & Kunci Diagnostik</h2>
+                        <p class="text-xs text-slate-500">Pilih level dan nomor soal untuk mengubah teks pertanyaan, opsi jawaban, alasan ilmiah, kunci, atau pembahasan.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="editor-select-level" class="px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-semibold bg-slate-50">
+                            <option value="1">Level 1: Wave Check</option>
+                            <option value="2">Level 2: Mudah</option>
+                            <option value="3">Level 3: Sedang</option>
+                            <option value="4">Level 4: Susah</option>
+                        </select>
+                        <button id="btn-reset-bank" type="button" class="px-3.5 py-2 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-bold">
+                            Reset Default
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-slate-500 mb-2">Pilih Nomor Soal:</div>
+                    <div id="editor-q-numbers" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div class="space-y-4 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Teks Pertanyaan / Pernyataan</label>
+                        <textarea id="edit-q-text" rows="3" class="w-full p-3 rounded-xl border border-slate-300 text-sm"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-blue-700 mb-2">Opsi Tier 1 (Klik radio button untuk Kunci Benar)</label>
+                            <div id="edit-tier1-container" class="space-y-2"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-indigo-700 mb-2">Alasan Tier 2 (Klik radio button untuk Alasan Benar)</label>
+                            <div id="edit-tier2-container" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Pembahasan Ilmiah</label>
+                        <textarea id="edit-q-explanation" rows="2" class="w-full p-3 rounded-xl border border-slate-300 text-sm"></textarea>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button id="btn-save-edited-question" type="button" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm transition">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Perubahan Soal
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="teacher-panel-setting" class="hidden max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                <h2 class="text-lg font-bold text-slate-800">Ubah PIN Akses Mode Guru</h2>
+                <p class="text-xs text-slate-500">PIN digunakan untuk melindungi akses ke transkrip nilai siswa dan editor bank soal. PIN bawaan adalah <strong>1234</strong>.</p>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Baru (Minimal 4 digit/karakter)</label>
+                    <input type="password" id="input-new-pin" placeholder="Masukkan PIN baru..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+                </div>
+                <button id="btn-update-pin" type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition">
+                    Simpan PIN Baru
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL LOGIN GURU ==================== -->
+    <div id="modal-teacher-login" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800">Akses Mode Guru</h3>
+                    <p class="text-xs text-slate-500">Masukkan PIN Guru (Default: <strong>1234</strong>)</p>
+                </div>
+            </div>
+            <input type="password" id="input-teacher-pin" placeholder="Masukkan PIN..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-center font-mono text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            <div class="flex gap-2 pt-1">
+                <button id="btn-cancel-teacher-login" type="button" class="flex-1 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50">Batal</button>
+                <button id="btn-submit-teacher-pin" type="button" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL TRANSKRIP DETAIL JAWABAN SISWA ==================== -->
+    <div id="modal-student-detail" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-50 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                <h3 id="modal-detail-title" class="font-bold text-slate-800 text-base">Transkrip Diagnostik Siswa</h3>
+                <button id="btn-close-detail-modal" type="button" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modal-detail-content" class="p-6 overflow-y-auto space-y-4"></div>
+        </div>
+    </div>
+
+    <script src="js/questions.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
